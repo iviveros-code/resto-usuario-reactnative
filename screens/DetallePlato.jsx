@@ -1,11 +1,53 @@
-import React from "react";
-import { View, Text } from "react-native";
+import React, { useContext } from "react";
+import { Image } from "react-native";
+import PedidoContext from "../context/pedidos/pedidoContext";
+
+import {
+  Container,
+  Content,
+  Footer,
+  FooterTab,
+  Button,
+  Body,
+  Text,
+  H1,
+  Card,
+  CardItem,
+} from "native-base";
+import { useNavigation } from "@react-navigation/native";
+import globalStyles from "../styles/global";
 
 const DetallePlato = () => {
+  const { plato } = useContext(PedidoContext);
+
+  const { nombre, imagen, precio, descripcion } = plato;
+
+  const navigation = useNavigation();
   return (
-    <View>
-      <Text> Detalle Plato Screen</Text>
-    </View>
+    <Container style={globalStyles.contenedor}>
+      <Content style={globalStyles.contenido}>
+        <H1 style={globalStyles.titulo}>{nombre}</H1>
+        <Card>
+          <CardItem>
+            <Body>
+              <Image source={{ uri: imagen }} style={globalStyles.imagen} />
+              <Text style={{ marginTop: 20 }}>{descripcion}</Text>
+              <Text style={globalStyles.cantidad}>Precio: $ {precio}</Text>
+            </Body>
+          </CardItem>
+        </Card>
+      </Content>
+      <Footer>
+        <FooterTab>
+          <Button
+            style={globalStyles.boton}
+            onPress={() => navigation.navigate("FormularioPlato")}
+          >
+            <Text style={globalStyles.botonTexto}>Ordenar Plato </Text>
+          </Button>
+        </FooterTab>
+      </Footer>
+    </Container>
   );
 };
 

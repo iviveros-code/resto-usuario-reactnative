@@ -4,7 +4,9 @@ import FirebaseReducer from "./firebaseReducer";
 import FirebaseContext from "./firebaseContext";
 
 import firebase from "../../firebase";
-import { OBTENER_PRODUCTOS } from "../../types";
+import { OBTENER_PRODUCTOS_EXITO } from "../../types";
+
+import _ from "lodash";
 
 const FirebaseState = (props) => {
   const initialState = {
@@ -13,11 +15,28 @@ const FirebaseState = (props) => {
 
   const [state, dispatch] = useReducer(FirebaseReducer, initialState);
 
-  const obtenerProductos = () => {
-    dispatch({
-      type: OBTENER_PRODUCTOS,
+  const obtenerProductos = () => {};
+
+  firebase.db
+    .collection("productos")
+    .where("existencia", "==", true)
+    .onSnapshot(handleSnapshot);
+
+  function handleSnapshot(snapshot) {
+    let platos = snapshot.docs.map((doc) => {
+      return {
+        id: doc.id,
+        ...doc.data(),
+      };
     });
-  };
+
+    platos = _.sortBy(platos, "categoria");
+
+    dispatch({
+      type: OBTENER_PRODUCTOS_EXITO,
+      payload: platos,
+    });
+  }
 
   return (
     <FirebaseContext.Provider
