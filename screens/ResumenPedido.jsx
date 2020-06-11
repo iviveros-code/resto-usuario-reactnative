@@ -19,17 +19,31 @@ import { useNavigation } from "@react-navigation/native";
 import PedidoContext from "../context/pedidos/pedidoContext";
 
 const ResumenPedido = () => {
-  const { pedido } = useContext(PedidoContext);
+  const { pedido, total, mostrarResumen } = useContext(PedidoContext);
 
-  console.log(pedido);
+  const navigation = useNavigation();
+  // console.log(pedido);
+  useEffect(() => {
+    calcularTotal();
+  }, [pedido]);
+
+  const calcularTotal = () => {
+    let nuevoTotal = 0;
+    nuevoTotal = pedido.reduce(
+      (nuevoTotal, articulo) => nuevoTotal + articulo.total,
+      0
+    );
+    mostrarResumen(nuevoTotal);
+  };
+
   return (
     <Container style={globalStyles.contenedor}>
       <Content style={globalStyles.contenido}>
         <H1 style={globalStyles.titulo}>Resumen del Pedido</H1>
-        {pedido.map((plato) => {
+        {pedido.map((plato, i) => {
           const { cantidad, nombre, imagen, id, precio } = plato;
           return (
-            <List key={id}>
+            <List key={id + i}>
               <ListItem thumbnail>
                 <Left>
                   <Thumbnail large source={{ uri: imagen }} />
@@ -43,8 +57,24 @@ const ResumenPedido = () => {
             </List>
           );
         })}
-        <Text style={globalStyles.cantidad}>Total a pagar: $</Text>
+        <Text style={globalStyles.cantidad}>Total a pagar: ${total}</Text>
+        <Button onPress={() => navigation.navigate("Menu")} full dark>
+          <Text style={[globalStyles.botonTexto, { color: "#fff" }]}>
+            Seguir Pidiendo
+          </Text>
+        </Button>
       </Content>
+      <Footer>
+        <FooterTab>
+          <Button
+            onPress={() => navigation.navigate("ProgresoPedido")}
+            style={[globalStyles.boton, { marginTop: 30 }]}
+            full
+          >
+            <Text style={globalStyles.botonTexto}>Ordenar Pedido</Text>
+          </Button>
+        </FooterTab>
+      </Footer>
     </Container>
   );
 };

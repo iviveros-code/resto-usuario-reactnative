@@ -2,7 +2,11 @@ import React, { useReducer } from "react";
 
 import PedidoReducer from "./pedidoReducer";
 import PedidoContext from "./pedidoContext";
-import { SELECCIONAR_PRODUCTO, CONFIRMAR_ORDENAR_PLATO } from "../../types";
+import {
+  SELECCIONAR_PRODUCTO,
+  CONFIRMAR_ORDENAR_PLATO,
+  MOSTRAR_RESUMEN,
+} from "../../types";
 
 const PedidoState = (props) => {
   const initialState = {
@@ -28,13 +32,23 @@ const PedidoState = (props) => {
       payload: pedido,
     });
   };
+
+  const mostrarResumen = (total) => {
+    dispatch({
+      type: MOSTRAR_RESUMEN,
+      payload: total,
+    });
+  };
+
   return (
     <PedidoContext.Provider
       value={{
         pedido: state.pedido,
         plato: state.plato,
+        total: state.total,
         seleccionarPlato,
         guardarPedido,
+        mostrarResumen,
       }}
     >
       {props.children}

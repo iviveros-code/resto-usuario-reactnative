@@ -1,4 +1,8 @@
-import { SELECCIONAR_PRODUCTO, CONFIRMAR_ORDENAR_PLATO } from "../../types";
+import {
+  SELECCIONAR_PRODUCTO,
+  CONFIRMAR_ORDENAR_PLATO,
+  MOSTRAR_RESUMEN,
+} from "../../types";
 export default (state, action) => {
   switch (action.type) {
     case SELECCIONAR_PRODUCTO: {
@@ -11,6 +15,12 @@ export default (state, action) => {
       return {
         ...state,
         pedido: [...state.pedido, action.payload],
+      };
+    }
+    case MOSTRAR_RESUMEN: {
+      return {
+        ...state,
+        total: action.payload,
       };
     }
     default:

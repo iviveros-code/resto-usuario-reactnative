@@ -11,6 +11,8 @@ import NuevaOrden from "./screens/NuevaOrden";
 import ProgresoPedido from "./screens/ProgresoPedido";
 import ResumenPedido from "./screens/ResumenPedido";
 
+import BotonResumen from "./components/UI/BotonResumen";
+
 import FirebaseState from "./context/firebase/firebaseState";
 import PedidoState from "./context/pedidos/pedidoState";
 
@@ -47,7 +49,10 @@ export default function App() {
               <Stack.Screen
                 name="Menu"
                 component={Menu}
-                options={{ title: "Nuestro Menú " }}
+                options={{
+                  title: "Nuestro Menú ",
+                  headerRight: (props) => <BotonResumen />,
+                }}
               />
               <Stack.Screen
                 name="DetallePlato"
