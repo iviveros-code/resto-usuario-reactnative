@@ -2,6 +2,8 @@ import {
   SELECCIONAR_PRODUCTO,
   CONFIRMAR_ORDENAR_PLATO,
   MOSTRAR_RESUMEN,
+  ELIMINAR_PRODUCTO,
+  PEDIDO_ORDENADO,
 } from "../../types";
 export default (state, action) => {
   switch (action.type) {
@@ -21,6 +23,22 @@ export default (state, action) => {
       return {
         ...state,
         total: action.payload,
+      };
+    }
+    case ELIMINAR_PRODUCTO: {
+      return {
+        ...state,
+        pedido: state.pedido.filter(
+          (articulo) => articulo.id !== action.payload
+        ),
+      };
+    }
+    case PEDIDO_ORDENADO: {
+      return {
+        ...state,
+        pedido: [],
+        total: 0,
+        idpedido: action.payload,
       };
     }
     default:

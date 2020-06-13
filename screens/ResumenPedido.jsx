@@ -1,5 +1,11 @@
-import React, { useEffect, useContext } from "react";
-import { StyleSheet, Alert } from "react-native";
+import React, { useEffect, useContext, useState } from "react";
+import {
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  Modal,
+  View,
+} from "react-native";
 import {
   Container,
   Content,
@@ -18,11 +24,21 @@ import globalStyles from "../styles/global";
 import { useNavigation } from "@react-navigation/native";
 import PedidoContext from "../context/pedidos/pedidoContext";
 
+import firebase from "../firebase";
+import Loading from "../components/Loading";
+
 const ResumenPedido = () => {
-  const { pedido, total, mostrarResumen } = useContext(PedidoContext);
+  const [modalVisible, setmodalVisible] = useState(false);
+  const {
+    pedido,
+    total,
+    mostrarResumen,
+    eliminarProducto,
+    pedidoOrdenado,
+  } = useContext(PedidoContext);
 
   const navigation = useNavigation();
-  // console.log(pedido);
+
   useEffect(() => {
     calcularTotal();
   }, [pedido]);
@@ -34,6 +50,62 @@ const ResumenPedido = () => {
       0
     );
     mostrarResumen(nuevoTotal);
+  };
+
+  const progresoPedido = () => {
+    Alert.alert(
+      "Revisa tu pedido",
+      "Una vez que realizas tu pedido no podrás cambiarlo",
+      [
+        {
+          text: "Confirmar",
+          onPress: async () => {
+            const pedidoObj = {
+              tiempoentrega: 0,
+              completado: false,
+              total: Number(total),
+              orden: pedido,
+              creado: Date.now(),
+            };
+
+            try {
+              setmodalVisible(true);
+              const pedido = await firebase.db
+                .collection("ordenes")
+                .add(pedidoObj);
+              pedidoOrdenado(pedido.id);
+              setmodalVisible(false);
+              navigation.navigate("ProgresoPedido");
+            } catch (error) {
+              console.log(error);
+            }
+          },
+        },
+        {
+          text: "Revisar",
+          style: "cancel",
+        },
+      ]
+    );
+  };
+
+  const confirmarEliminacion = (id) => {
+    Alert.alert(
+      "Deseas eliminar este artículo??",
+      "Una vez eliminado tu artículo no podrás recuperarlo",
+      [
+        {
+          text: "Confirmar",
+          onPress: () => {
+            eliminarProducto(id);
+          },
+        },
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+      ]
+    );
   };
 
   return (
@@ -52,6 +124,14 @@ const ResumenPedido = () => {
                   <Text>{nombre}</Text>
                   <Text>Cantidad: {cantidad}</Text>
                   <Text>Precio: $ {precio}</Text>
+                  <Button
+                    full
+                    danger
+                    style={{ marginTop: 20 }}
+                    onPress={() => confirmarEliminacion(id)}
+                  >
+                    <Text>Eliminar</Text>
+                  </Button>
                 </Body>
               </ListItem>
             </List>
@@ -64,10 +144,12 @@ const ResumenPedido = () => {
           </Text>
         </Button>
       </Content>
+      <Loading visible={modalVisible} text="Cargando.." />
+
       <Footer>
         <FooterTab>
           <Button
-            onPress={() => navigation.navigate("ProgresoPedido")}
+            onPress={() => progresoPedido()}
             style={[globalStyles.boton, { marginTop: 30 }]}
             full
           >
